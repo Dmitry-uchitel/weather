@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Session {
     private String id;
-    private Long iserId;
+    private Long userId;
     private LocalDateTime ExpiresAt;
 
 
