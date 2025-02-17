@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.dimas.weather.model.Location;
 import ru.dimas.weather.repository.LocationRepository;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Service
@@ -14,8 +15,8 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
 
-    public Set<Location> getAllLocationByUser(Long id) {
-        return (Set<Location>) locationRepository.findAllByUserId(id);
+    public Iterable<Location> getAllLocationByUser(Long id) {
+        return locationRepository.findAllByUserId(id);
     }
 
     public Location createLocation(Location location){
@@ -23,7 +24,10 @@ public class LocationService {
     }
 
     public boolean isExistForUser(Long userId, Location location){
-        return !((Set<Location>)locationRepository.findByUserIdAndLatitudeAndLongitude(userId, location.getLatitude(), location.getLongitude())).isEmpty();
+        return (locationRepository.findByUserIdAndLatitudeAndLongitude(userId, location.getLatitude(), location.getLongitude()).iterator().hasNext());
     }
 
+    public void deleteLocationById(Long locationId) {
+        locationRepository.deleteLocationById(locationId);
+    }
 }

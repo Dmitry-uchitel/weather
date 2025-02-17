@@ -1,4 +1,4 @@
-package ru.dimas.weather.exeption;
+package ru.dimas.weather.exception;
 
 public class UserAlreadyExistsException extends RuntimeException{
     public UserAlreadyExistsException(String message) {

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <!-- Подключение Bootstrap 5 через CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh; background-color: #f8f9fa;">
+<div class="card p-4" style="width: 40rem;">
+    <h2 class="card-title text-center mb-4">Добро пожаловать, <span th:text="${username}"></span>!</h2>
+
+    <!-- Кнопка Log Out -->
+    <form th:action="@{/logout}" method="POST">
+        <button type="submit" class="btn btn-danger w-100 mb-4">Выйти</button>
+    </form>
+
+    <!-- Отображение списка локаций и погоды -->
+    <h3 class="mb-3">Погода в ваших локациях:</h3>
+    <ul class="list-group">
+        <li th:each="weather : ${weatherData}" class="list-group-item">
+            <strong th:text="${weather.name}"></strong> - Температура: <span th:text="${weather.main.temp} + '°C'"></span>
+        </li>
+    </ul>
+
+    <!-- Форма для добавления новой локации -->
+    <h3 class="mt-4">Добавить новую локацию:</h3>
+    <form th:action="@{/weather/{id}/add(locationName=${locationName})}" th:object="${locationName}" method="GET">
+        <div class="mb-3">
+            <label for="locationName" class="form-label">Название локации</label>
+            <input type="text" class="form-control" id="locationName" name="locationName" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Поиск локации</button>
+    </form>
+</div>
+
+<!-- Подключение JavaScript Bootstrap и зависимостей -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

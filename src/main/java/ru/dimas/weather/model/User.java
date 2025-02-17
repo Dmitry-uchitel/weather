@@ -1,5 +1,6 @@
 package ru.dimas.weather.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,9 +20,10 @@ public class User {
     private String login;
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Setter(AccessLevel.NONE) // Запрещаем прямое изменение коллекции через сеттер
     @JsonManagedReference
+    @JsonIgnore
     private Set<Location> locationSet = new HashSet<>();
 
     public void addLocation(Location location) {
@@ -29,9 +31,10 @@ public class User {
         location.setUser(this); // Установка обратной связи
     }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Setter(AccessLevel.NONE) // Запрещаем прямое изменение коллекции через сеттер
     @JsonManagedReference
+    @JsonIgnore
     private Set<Session> sessionSet = new HashSet<>();
 
     public void addSession(Session session) {

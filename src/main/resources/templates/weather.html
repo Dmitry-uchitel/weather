@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Погода</title>
+    <!-- Подключение Bootstrap 5 через CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключение jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh; background-color: #f8f9fa;">
+<!-- Кнопка Logout и отображение логина пользователя -->
+<div class="w-100 text-end mb-3 d-flex justify-content-end align-items-center">
+    <span class="me-3" id="userLogin" th:text="'Вы вошли как: ' + ${userLogin}">Вы вошли как: [логин]</span>
+    <button id="logoutButton" class="btn btn-danger">Logout</button>
+</div>
+<div class="card p-4" style="width: 40rem;">
+    <h2 class="card-title text-center mb-4">Погода</h2>
+    <!-- Таблица с погодой -->
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Город</th>
+            <th>Температура</th>
+            <th>Ощущается как</th>
+            <th>Давление</th>
+            <th>Влажность</th>
+            <th>Скорость ветра</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="weather : ${weatherData}">
+            <td th:text="${weather.name}"></td>
+            <td th:text="${weather.temp} + '°C'"></td>
+            <td th:text="${weather.feelsLike} + '°C'"></td>
+            <td th:text="${weather.pressure} + ' мм рт.ст.'"></td>
+            <td th:text="${weather.humidity} + '%'"></td>
+            <td th:text="${weather.windSpeed} + ' м/с'"></td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- Форма для поиска локаций -->
+    <form id="locationSearchForm" class="mt-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="locationName" placeholder="Введите название локации" required>
+            <button type="submit" class="btn btn-primary">Поиск</button>
+        </div>
+    </form>
+    <!-- Результаты поиска -->
+    <div id="searchResults" class="mt-3">
+        <ul id="resultsList" class="list-group"></ul>
+    </div>
+</div>
+<!-- Скрипт для работы с API -->
+<script>
+    // Получаем ID пользователя из сессии
+    let userId = null;
+    fetch('/session/userId', { credentials: 'include' }) // Запрос к серверу для получения userId
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка получения ID пользователя');
+            }
+            return response.json();
+        })
+        .then(data => {
+            userId = data.userId;
+            console.log('Получен ID пользователя:', userId);
+        })
+        .catch(error => {
+            alert('Произошла ошибка при получении ID пользователя: ' + error.message);
+        });
+
+    // Поиск локаций по имени
+    document.getElementById('locationSearchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (!userId) {
+            alert("ID пользователя не получен. Пожалуйста, обновите страницу.");
+            return;
+        }
+        const locationName = document.getElementById('locationName').value;
+        if (!locationName.trim()) {
+            alert("Пожалуйста, введите название города.");
+            return;
+        }
+        fetch(`/weather/${userId}/add?locationName=${encodeURIComponent(locationName)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка поиска локации');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const resultsList = document.getElementById('resultsList');
+                resultsList.innerHTML = ''; // Очищаем список результатов
+                if (data.length === 0) {
+                    resultsList.innerHTML = '<li class="list-group-item">Нет результатов</li>';
+                    return;
+                }
+                data.forEach(city => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.textContent = `${city.name}, Страна: ${city.country}, Штат: ${city.state}`;
+                    // Добавление кнопки "Добавить"
+                    const addButton = document.createElement('button');
+                    addButton.className = 'btn btn-sm btn-success float-end ms-2';
+                    addButton.textContent = 'Добавить';
+                    addButton.onclick = () => addLocation(city);
+                    listItem.appendChild(addButton);
+                    resultsList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                alert('Произошла ошибка при поиске локации: ' + error.message);
+            });
+    });
+
+    // Добавление локации
+    function addLocation(city) {
+        fetch(`/weather/${userId}/add`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: city.name,
+                lat: city.lat,
+                lon: city.lon
+            }),
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка добавления локации');
+                }
+                alert('Локация успешно добавлена!');
+                window.location.reload(); // Обновляем страницу
+            })
+            .catch(error => {
+                alert('Произошла ошибка при добавлении локации: ' + error.message);
+            });
+    }
+
+    // Обработка кнопки Logout
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        fetch('/logout', {
+            method: 'POST',
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка выхода из системы');
+                }
+                alert('Вы успешно вышли из системы.');
+                window.location.href = '/login'; // Перенаправление на страницу входа
+            })
+            .catch(error => {
+                alert('Произошла ошибка при выходе из системы: ' + error.message);
+            });
+    });
+</script>
+<!-- Подключение JavaScript Bootstrap и зависимостей -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package ru.dimas.weather.exeption;
+package ru.dimas.weather.exception;
 
 public class LocationAlreadyAddedException extends RuntimeException{
     public LocationAlreadyAddedException(String message) {

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @Setter
 @ToString(exclude = {"local_names"})
 public class City {
+
     private String name;
     @JsonIgnore
     private String local_names;

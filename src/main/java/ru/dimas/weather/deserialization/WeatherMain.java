@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class WeatherMain {
 
+    private Long idFromDatabase;
     private String name;
     private double temp;
     private double feelsLike;

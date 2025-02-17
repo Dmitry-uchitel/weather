@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(includeFieldNames=true)
+@ToString(includeFieldNames=true, exclude = {"user"})
 @Entity
 @Table(name = "sessions")
 public class Session {

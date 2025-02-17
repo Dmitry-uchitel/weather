@@ -6,10 +6,10 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS locations (
                                          id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-                                         name VARCHAR(50) NOT NULL UNIQUE,
+                                         name VARCHAR(50) NOT NULL,
                                          userId BIGINT references users (id),
-                                         latitude BIGINT,
-                                         longitude BIGINT
+                                         latitude NUMERIC(15,8),
+                                         longitude NUMERIC(15,8)
 );
 
 CREATE TABLE IF NOT EXISTS sessions (

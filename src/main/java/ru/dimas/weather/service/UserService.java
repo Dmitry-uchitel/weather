@@ -43,8 +43,8 @@ public class UserService {
         return userRepository.existsByLogin(login);
     }
 
-    public List<User> getAllUser() {
-        return userRepository.findAll();
-    }
+//    public List<User> getAllUser() {
+//        return userRepository.findAll();
+//    }
 
 }

@@ -1,7 +1,7 @@
 package ru.dimas.weather.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.dimas.weather.exeption.SessionIsAlreadyOverException;
 import ru.dimas.weather.model.Session;
 import ru.dimas.weather.repository.SessionRepository;
 
@@ -11,6 +11,8 @@ import java.util.UUID;
 
 @Service
 public class SessionService {
+    @Value("${weather.session.time}")
+    private Long sessionTime; // Загружается из application.properties
 
     private final SessionRepository sessionRepository;
     public SessionService(SessionRepository sessionRepository) {
@@ -24,16 +26,5 @@ public class SessionService {
     public void deleteSession(UUID id) {
         sessionRepository.deleteById(id);
     }
-
-
-//    public boolean isExist(UUID id){
-//
-//        if (sessionRepository.findById(id).get().getExpiresAt().plusMinutes(30)
-//                .isAfter(LocalDateTime.now())){
-//        }
-//        else {
-//            throw new SessionIsAlreadyOverException("Session is already over!!!");
-//        }
-//    }
-
+    public void deleteEndedSessions() {sessionRepository.deleteAllByExpiresAtBefore(LocalDateTime.now().minusMinutes(sessionTime));}
 }
