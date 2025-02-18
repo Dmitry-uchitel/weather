@@ -1,4 +1,4 @@
-package ru.dimas.weather.service;
+package ru.dimas.weather.service.withdb;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

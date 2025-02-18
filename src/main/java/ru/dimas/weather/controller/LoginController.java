@@ -3,16 +3,14 @@ package ru.dimas.weather.controller;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import ru.dimas.weather.exception.UserWithLoginIsNotExist;
+import ru.dimas.weather.exception.WrongPasswordException;
+import ru.dimas.weather.DTO.UserDto;
 import ru.dimas.weather.model.User;
-import ru.dimas.weather.service.LoginService;
+import ru.dimas.weather.service.withoutdb.LoginService;
 
 @Controller
 @RequestMapping("/login")
@@ -28,13 +26,23 @@ public class LoginController {
     @GetMapping
     public String showLoginPage(Model model) {
         logger.info("show Login page");
+        model.addAttribute("userDto", new UserDto());
+//        return "registration"; // имя HTML-шаблона без расширения
+
         return "login"; // Отображение страницы регистрации
     }
 
     @PostMapping
-    public HttpEntity<Object> loginUser(@RequestBody @Validated User user, HttpSession httpSession) {
-        logger.info("loginUser with login: {}", user.getLogin());
-
-        return loginService.loginUser(user, httpSession);
+    public String loginUser(@ModelAttribute UserDto userDto, HttpSession httpSession, Model model) {
+        logger.info("Attempting to login with username {} and password {}", userDto.getLogin(), userDto.getPassword());
+        User user = new User(userDto);
+        try {
+            loginService.loginUser(user, httpSession);
+        }
+        catch (UserWithLoginIsNotExist | WrongPasswordException e){
+            model.addAttribute("errorMessage", e.getMessage());
+            return "/login";
+        }
+        return "redirect:/weather/" + httpSession.getAttribute("userId");
     }
 }

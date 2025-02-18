@@ -29,4 +29,11 @@ public class Location {
     private BigDecimal latitude;
     private BigDecimal longitude;
 
+    public Location(String name, User user, BigDecimal latitude, BigDecimal longitude) {
+        this.id = id;
+        this.name = name;
+        this.user = user;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }

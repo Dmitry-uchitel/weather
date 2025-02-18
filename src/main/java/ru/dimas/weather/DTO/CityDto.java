@@ -1,4 +1,4 @@
-package ru.dimas.weather.deserialization;
+package ru.dimas.weather.DTO;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @ToString(exclude = {"local_names"})
-public class City {
+public class CityDto {
 
     private String name;
     @JsonIgnore

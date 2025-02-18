@@ -18,5 +18,5 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     Iterable<Location> findAllByUserId(Long userId);
     Iterable<Location> findByUserIdAndLatitudeAndLongitude(Long userId, BigDecimal latitude, BigDecimal longitude);
 
-    void deleteLocationById(Long id);
+
 }

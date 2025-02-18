@@ -1,11 +1,11 @@
-package ru.dimas.weather.deserialization;
+package ru.dimas.weather.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class WeatherMain {
+public class WeatherDto {
 
     private Long idFromDatabase;
     private String name;

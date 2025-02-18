@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import ru.dimas.weather.DTO.UserDto;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,5 +42,10 @@ public class User {
     public void addSession(Session session) {
         sessionSet.add(session);
         session.setUser(this); // Установка обратной связи
+    }
+
+    public User(UserDto userDTO) {
+        this.login = userDTO.getLogin();
+        this.password = userDTO.getPassword();
     }
 }

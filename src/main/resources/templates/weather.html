@@ -1,165 +1,131 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Погода</title>
-    <!-- Подключение Bootstrap 5 через CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Подключение jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Подключение Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <style>
+        /* Дополнительные пользовательские стили */
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .user-info {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .weather-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .weather-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .weather-item:last-child {
+            border-bottom: none;
+        }
+        .search-form {
+            margin-bottom: 20px;
+        }
+        .city-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .city-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .city-item:last-child {
+            border-bottom: none;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
 </head>
-<body class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh; background-color: #f8f9fa;">
-<!-- Кнопка Logout и отображение логина пользователя -->
-<div class="w-100 text-end mb-3 d-flex justify-content-end align-items-center">
-    <span class="me-3" id="userLogin" th:text="'Вы вошли как: ' + ${userLogin}">Вы вошли как: [логин]</span>
-    <button id="logoutButton" class="btn btn-danger">Logout</button>
-</div>
-<div class="card p-4" style="width: 40rem;">
-    <h2 class="card-title text-center mb-4">Погода</h2>
-    <!-- Таблица с погодой -->
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Город</th>
-            <th>Температура</th>
-            <th>Ощущается как</th>
-            <th>Давление</th>
-            <th>Влажность</th>
-            <th>Скорость ветра</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="weather : ${weatherData}">
-            <td th:text="${weather.name}"></td>
-            <td th:text="${weather.temp} + '°C'"></td>
-            <td th:text="${weather.feelsLike} + '°C'"></td>
-            <td th:text="${weather.pressure} + ' мм рт.ст.'"></td>
-            <td th:text="${weather.humidity} + '%'"></td>
-            <td th:text="${weather.windSpeed} + ' м/с'"></td>
-        </tr>
-        </tbody>
-    </table>
-    <!-- Форма для поиска локаций -->
-    <form id="locationSearchForm" class="mt-4">
+<body>
+<div class="container">
+    <!-- Информация о пользователе -->
+    <div class="user-info">
+        <span>Вы вошли как: <strong th:text="${session.userLogin}"></strong></span>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-secondary ms-2">Выйти</button>
+        </form>
+    </div>
+
+    <!-- Ошибки -->
+    <div th:if="${errorMessage}" class="error-message">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <!-- Список погоды -->
+    <h2>Список городов</h2>
+    <ul class="weather-list">
+        <li th:each="weather : ${weatherList}">
+            <div class="weather-item">
+                <div>
+                    <p><strong th:text="${weather.name}"></strong></p>
+                    <p>Температура: <span th:text="${weather.temp}"></span> °C</p>
+                    <p>Ощущается как: <span th:text="${weather.feelsLike}"></span> °C</p>
+                    <p>Давление: <span th:text="${weather.pressure}"></span> гПа</p>
+                    <p>Влажность: <span th:text="${weather.humidity}"></span> %</p>
+                    <p>Скорость ветра: <span th:text="${weather.windSpeed}"></span> м/с</p>
+                </div>
+                <form th:action="@{'/weather/' + ${session.userId} + '/delete'}" method="post">
+                    <input type="hidden" th:name="idFromDatabase" th:value="${weather.idFromDatabase}" />
+                    <input type="hidden" th:name="name" th:value="${weather.name}" />
+                    <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                </form>
+            </div>
+        </li>
+    </ul>
+
+    <!-- Поиск локаций -->
+    <h2>Добавить город</h2>
+    <form th:action="@{'/weather/' + ${session.userId} + '/add'}" method="get" class="search-form">
         <div class="input-group">
-            <input type="text" class="form-control" id="locationName" placeholder="Введите название локации" required>
-            <button type="submit" class="btn btn-primary">Поиск</button>
+            <input type="text" name="locationName" class="form-control" placeholder="Введите название города" required />
+            <button type="submit" class="btn btn-primary">Найти</button>
         </div>
     </form>
-    <!-- Результаты поиска -->
-    <div id="searchResults" class="mt-3">
-        <ul id="resultsList" class="list-group"></ul>
-    </div>
+
+    <!-- Список найденных локаций -->
+    <ul class="city-list" th:if="${cityDtoList != null and !cityDtoList.isEmpty()}">
+        <li th:each="city : ${cityDtoList}">
+            <div class="city-item">
+                <div>
+                    <p><strong th:text="${city.name}"></strong>, <span th:text="${city.country}"></span></p>
+                    <p>Координаты: <span th:text="${city.lat}"></span>, <span th:text="${city.lon}"></span></p>
+                </div>
+                <form th:action="@{'/weather/' + ${session.userId} + '/add'}" method="post">
+                    <input type="hidden" name="name" th:value="${city.name}" />
+                    <input type="hidden" name="lat" th:value="${city.lat}" />
+                    <input type="hidden" name="lon" th:value="${city.lon}" />
+                    <button type="submit" class="btn btn-sm btn-success">Добавить</button>
+                </form>
+            </div>
+        </li>
+    </ul>
 </div>
-<!-- Скрипт для работы с API -->
-<script>
-    // Получаем ID пользователя из сессии
-    let userId = null;
-    fetch('/session/userId', { credentials: 'include' }) // Запрос к серверу для получения userId
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка получения ID пользователя');
-            }
-            return response.json();
-        })
-        .then(data => {
-            userId = data.userId;
-            console.log('Получен ID пользователя:', userId);
-        })
-        .catch(error => {
-            alert('Произошла ошибка при получении ID пользователя: ' + error.message);
-        });
 
-    // Поиск локаций по имени
-    document.getElementById('locationSearchForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        if (!userId) {
-            alert("ID пользователя не получен. Пожалуйста, обновите страницу.");
-            return;
-        }
-        const locationName = document.getElementById('locationName').value;
-        if (!locationName.trim()) {
-            alert("Пожалуйста, введите название города.");
-            return;
-        }
-        fetch(`/weather/${userId}/add?locationName=${encodeURIComponent(locationName)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка поиска локации');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const resultsList = document.getElementById('resultsList');
-                resultsList.innerHTML = ''; // Очищаем список результатов
-                if (data.length === 0) {
-                    resultsList.innerHTML = '<li class="list-group-item">Нет результатов</li>';
-                    return;
-                }
-                data.forEach(city => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'list-group-item';
-                    listItem.textContent = `${city.name}, Страна: ${city.country}, Штат: ${city.state}`;
-                    // Добавление кнопки "Добавить"
-                    const addButton = document.createElement('button');
-                    addButton.className = 'btn btn-sm btn-success float-end ms-2';
-                    addButton.textContent = 'Добавить';
-                    addButton.onclick = () => addLocation(city);
-                    listItem.appendChild(addButton);
-                    resultsList.appendChild(listItem);
-                });
-            })
-            .catch(error => {
-                alert('Произошла ошибка при поиске локации: ' + error.message);
-            });
-    });
-
-    // Добавление локации
-    function addLocation(city) {
-        fetch(`/weather/${userId}/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: city.name,
-                lat: city.lat,
-                lon: city.lon
-            }),
-            credentials: 'include'
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка добавления локации');
-                }
-                alert('Локация успешно добавлена!');
-                window.location.reload(); // Обновляем страницу
-            })
-            .catch(error => {
-                alert('Произошла ошибка при добавлении локации: ' + error.message);
-            });
-    }
-
-    // Обработка кнопки Logout
-    document.getElementById('logoutButton').addEventListener('click', function() {
-        fetch('/logout', {
-            method: 'POST',
-            credentials: 'include'
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка выхода из системы');
-                }
-                alert('Вы успешно вышли из системы.');
-                window.location.href = '/login'; // Перенаправление на страницу входа
-            })
-            .catch(error => {
-                alert('Произошла ошибка при выходе из системы: ' + error.message);
-            });
-    });
-</script>
-<!-- Подключение JavaScript Bootstrap и зависимостей -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Подключение Bootstrap JS (необязательно, если не используете компоненты JS) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
 </body>
 </html>

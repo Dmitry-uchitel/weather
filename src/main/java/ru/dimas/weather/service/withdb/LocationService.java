@@ -1,4 +1,4 @@
-package ru.dimas.weather.service;
+package ru.dimas.weather.service.withdb;
 
 import org.springframework.stereotype.Service;
 import ru.dimas.weather.model.Location;
@@ -28,6 +28,6 @@ public class LocationService {
     }
 
     public void deleteLocationById(Long locationId) {
-        locationRepository.deleteLocationById(locationId);
+        locationRepository.deleteById(locationId);
     }
 }

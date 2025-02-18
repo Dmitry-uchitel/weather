@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.dimas.weather.service.SessionService;
+import ru.dimas.weather.service.withdb.SessionService;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -27,6 +27,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(SessionIsAlreadyOverException.class)
     public String handleSessionIsAlreadyOverException(SessionIsAlreadyOverException ex, Model model) {
         sessionService.deleteEndedSessions();
+        model.addAttribute("errorMesage", ex.getMessage());
         return "index";
     }
 
@@ -43,6 +44,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(PageNotFoundException.class)
+    public ResponseEntity<String> handlePageNotFoundException(PageNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     // Обработка WrongPasswordException
     @ExceptionHandler(WrongPasswordException.class)
     public ResponseEntity<String> handleWrongPasswordException(WrongPasswordException ex) {
@@ -54,4 +60,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handleGeneralException(Exception ex) {
         return new ResponseEntity<>("An unexpected error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
 }

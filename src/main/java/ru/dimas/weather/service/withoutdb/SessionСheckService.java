@@ -1,4 +1,4 @@
-package ru.dimas.weather.service;
+package ru.dimas.weather.service.withoutdb;
 
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.dimas.weather.controller.WeatherController;
 import ru.dimas.weather.exception.SessionIsAlreadyOverException;
 import ru.dimas.weather.model.Session;
-import ru.dimas.weather.service.SessionService;
+import ru.dimas.weather.service.withdb.SessionService;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,8 +19,6 @@ public class SessionСheckService {
 
 
     private final Logger logger = LoggerFactory.getLogger(WeatherController.class);
-    @Value("${weather.session.time}")
-    private Long sessionTime; // Загружается из application.properties
 
     public boolean sessionIsExistAndActive(UUID sessionId, SessionService sessionService) {
         if (sessionId==null){
@@ -35,8 +33,8 @@ public class SessionСheckService {
             logger.error("Session is not exist in database");
             return false;
         }
-        logger.info("time, when session end: {}\t now: {}", session.getExpiresAt().plusMinutes(sessionTime),LocalDateTime.now());
-        return session.getExpiresAt().plusMinutes(sessionTime).isAfter(LocalDateTime.now());
+        logger.info("Time when the session ends: {}\t now: {}", session.getExpiresAt(),LocalDateTime.now());
+        return session.getExpiresAt().isAfter(LocalDateTime.now());
     }
 
     public void checkSession(SessionService sessionService, HttpSession httpSession) {
