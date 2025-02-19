@@ -23,10 +23,6 @@ public class LocationService {
         return locationRepository.save(location);
     }
 
-    public boolean isExistForUser(Long userId, Location location){
-        return (locationRepository.findByUserIdAndLatitudeAndLongitude(userId, location.getLatitude(), location.getLongitude()).iterator().hasNext());
-    }
-
     public void deleteLocationById(Long locationId) {
         locationRepository.deleteById(locationId);
     }

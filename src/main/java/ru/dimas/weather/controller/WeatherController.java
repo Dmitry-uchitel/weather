@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -55,17 +56,14 @@ public class WeatherController {
         sessionСheckService.checkSession(sessionService, httpSession);
         try {
             getWeatherForUser.getAllWeatherForUser(model, (Long) httpSession.getAttribute("userId"));
-        }
-        catch (LocationsFromApiNotFoundException| ResourceAccessException e){
+        } catch (LocationsFromApiNotFoundException | ResourceAccessException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }
         logger.info("showUserWeatherPage method is finished for User with ID {}", httpSession.getAttribute("userId"));
-
         return "weather"; // Имя шаблона
     }
 
     @GetMapping("/{id}/add")
-//    @ResponseBody
     public String searchLocations(@PathVariable Long id, @RequestParam String locationName, HttpSession httpSession, Model model) {
         logger.info("searchLocations method called with userId: {}, locationName: {}", httpSession.getAttribute("userId"), locationName);
         sessionСheckService.checkSession(sessionService, httpSession);
@@ -76,29 +74,24 @@ public class WeatherController {
     }
 
     @PostMapping("/{id}/add")
-//    @ResponseBody
     public String addLocation(@ModelAttribute CityDto cityDto, HttpSession httpSession, Model model, @PathVariable Long id) {
         id = (Long) httpSession.getAttribute("userId");
         logger.info("addLocation method called with userId: {}, location: {}", id, cityDto);
         sessionСheckService.checkSession(sessionService, httpSession);
-
-        Location location = null;
         try {
             Optional<User> userOptional = userService.getUserById(id);
             if (userOptional.isEmpty()) {
                 logger.error("User with ID {} not found", id);
                 throw new UserNotFoundException("user with this id not found");
             }
-
             User user = userOptional.get();
-            location = new Location(cityDto.getName(), user, cityDto.getLat(), cityDto.getLon());
-            if (locationService.isExistForUser(id, location)) {
-                logger.error("User with ID {} already has this location {}", id, cityDto.getName());
-                throw new LocationAlreadyAddedException("Location already added");
-            }
-            else {
+            Location location = new Location(cityDto.getName(), user, cityDto.getLat(), cityDto.getLon());
+            try {
                 locationService.createLocation(location);
                 logger.info("Location added successfully: {}", location);
+            } catch (DataIntegrityViolationException e) {
+                logger.error("User with ID {} already has this location {}, e: {}", id, cityDto.getName(), e.getMessage());
+                throw new LocationAlreadyAddedException("Location already added");
             }
         } catch (LocationAlreadyAddedException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -107,16 +100,15 @@ public class WeatherController {
         } catch (UserNotFoundException e) {
             return "login";
         }
-
         return "redirect:/weather/" + id;
     }
 
     @PostMapping("/{id}/delete")
-//    @ResponseBody
     public String deleteLocation(@ModelAttribute WeatherDto weatherDto, HttpSession httpSession, Model model, @PathVariable Long id) {
         logger.info("deleteLocation method called with userId: {}, location with id: {}", httpSession.getAttribute("userId"), weatherDto.getIdFromDatabase());
         sessionСheckService.checkSession(sessionService, httpSession);
         locationService.deleteLocationById((Long) weatherDto.getIdFromDatabase());
+        logger.info("deleteLocation: location deleted with userId: {}, location with id: {}", httpSession.getAttribute("userId"), weatherDto.getIdFromDatabase());
         return "redirect:/weather/" + httpSession.getAttribute("userId");
     }
 }

@@ -8,8 +8,9 @@ CREATE TABLE IF NOT EXISTS locations (
                                          id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                                          name VARCHAR(50) NOT NULL,
                                          userId BIGINT references users (id),
-                                         latitude NUMERIC(20,16),
-                                         longitude NUMERIC(20,16)
+                                         latitude NUMERIC(20,16) NOT NULL,
+                                         longitude NUMERIC(20,16) NOT NULL,
+                                         CONSTRAINT unique_coordinates_for_user UNIQUE (userId, latitude, longitude)
 );
 
 CREATE TABLE IF NOT EXISTS sessions (

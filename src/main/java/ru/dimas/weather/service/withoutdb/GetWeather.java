@@ -58,11 +58,9 @@ public class GetWeather {
             cities = jsonMapper.readValue(response, jsonMapper.getTypeFactory().constructCollectionType(List.class, CityDto.class));
         } catch (JsonProcessingException ex) {
             logger.warn("Ошибка десериализации");
-//                throw new LocationsFromApiNotFoundException("Локации по запросу не найдены");
         }
         if (cities == null || cities.isEmpty()) {
             logger.warn("Список городов пуст для запроса: {}", cityName);
-//                throw new LocationsFromApiNotFoundException("Локации по запросу не найдены");
         } else {
             logger.info("Найдено {} городов для запроса: {}", cities.size(), cityName);
         }// Возвращаем успешный ответ
@@ -84,7 +82,6 @@ public class GetWeather {
         RestTemplate restTemplate = new RestTemplate();
         // Выполняем GET-запрос
         String response = restTemplate.getForObject(url, String.class);
-//        logger.info("{}", response);
         // Проверяем, что ответ не null
         if (response == null) {
             logger.warn("Пустой ответ от API для города org/data/2.5");
@@ -96,21 +93,15 @@ public class GetWeather {
             weather = WeatherDeserializer.deserializeWeather(response);
             if (weather == null) {
                 logger.warn("Ошибка десериализации");
-//                    throw new LocationsFromApiNotFoundException("Локации по запросу не найдены");
             }
         } catch (Exception e) {
             logger.error("Ошибка при десериализации JSON", e);
-//                return ResponseEntity.status(500).body(null); // Возвращаем 500 Internal Server Error
         }
         weather.setName(location.getName());
         // Возвращаем успешный ответ
         logger.info("Получены данные о погоде: {}", weather);
         return weather;
 
-//        } catch (Exception e) {
-//            logger.error("Ошибка при получении данных о погоде", e);
-//            return ResponseEntity.status(500).body(null); // Возвращаем 500 Internal Server Error
-//        }
     }
 
 }

@@ -5,14 +5,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import ru.dimas.weather.controller.WeatherController;
 import ru.dimas.weather.DTO.WeatherDto;
+import ru.dimas.weather.controller.WeatherController;
 import ru.dimas.weather.model.Location;
 import ru.dimas.weather.model.User;
 import ru.dimas.weather.service.withdb.LocationService;
 import ru.dimas.weather.service.withdb.UserService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class GetWeatherForUser {
 
@@ -31,7 +34,7 @@ public class GetWeatherForUser {
         this.locationService = locationService;
     }
 
-    public void getAllWeatherForUser(Model model, Long userId){
+    public void getAllWeatherForUser(Model model, Long userId) {
         logger.info("metod getAllWeather for User with ID {} start", userId);
         Optional<User> userOptional = userService.getUserById(userId);
         if (userOptional.isEmpty()) {
@@ -52,8 +55,8 @@ public class GetWeatherForUser {
             }
         }
         logger.info("Adding to model: weatherData size = {}", weatherList.size());
-            model.addAttribute("weatherList", weatherList);
-            model.addAttribute("userLogin", user.getLogin());
+        model.addAttribute("weatherList", weatherList);
+        model.addAttribute("userLogin", user.getLogin());
         logger.info("metod getAllWeather for User with ID {} end", userId);
     }
 }

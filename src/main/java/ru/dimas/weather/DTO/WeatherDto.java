@@ -14,5 +14,4 @@ public class WeatherDto {
     private int pressure;
     private int humidity;  //Влажность
     private double windSpeed;
-
 }

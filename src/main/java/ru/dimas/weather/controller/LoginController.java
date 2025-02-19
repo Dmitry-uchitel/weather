@@ -27,8 +27,6 @@ public class LoginController {
     public String showLoginPage(Model model) {
         logger.info("show Login page");
         model.addAttribute("userDto", new UserDto());
-//        return "registration"; // имя HTML-шаблона без расширения
-
         return "login"; // Отображение страницы регистрации
     }
 
@@ -38,8 +36,7 @@ public class LoginController {
         User user = new User(userDto);
         try {
             loginService.loginUser(user, httpSession);
-        }
-        catch (UserWithLoginIsNotExist | WrongPasswordException e){
+        } catch (UserWithLoginIsNotExist | WrongPasswordException e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "/login";
         }

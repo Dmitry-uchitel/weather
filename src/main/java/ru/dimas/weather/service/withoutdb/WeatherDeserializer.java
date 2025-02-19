@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.dimas.weather.DTO.WeatherDto;
-
 import java.io.IOException;
 
 public class WeatherDeserializer {

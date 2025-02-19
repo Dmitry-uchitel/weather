@@ -4,8 +4,8 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 import ru.dimas.weather.controller.WeatherController;
 import ru.dimas.weather.exception.UserAlreadyExistsException;
 import ru.dimas.weather.exception.UserWithLoginIsNotExist;
@@ -63,14 +63,15 @@ public class LoginService {
         logger.info("A session: {} has been created for the user with login: {} and id: {}", session.getId(), user.getLogin(), user.getId());
     }
 
-    public void registration(User user, HttpSession httpSession){
+    public void registration(User user, HttpSession httpSession) {
         logger.info("registrationUser method called with userName: {}", user.getLogin());
         // Проверяем, существует ли пользователь с таким логином
-        if (userService.userExists(user.getLogin())) {
+        try {
+            userService.createUser(user);
+        } catch (DataIntegrityViolationException e) {
             logger.error("User with login {} already exist", user.getLogin());
             throw new UserAlreadyExistsException("User with this login already exists");
         }
-        userService.createUser(user);
         createSesion(user, httpSession, sessionService);
         logger.info("User registration is end");
     }
