@@ -21,7 +21,7 @@ import ru.dimas.weather.service.withdb.SessionService;
 import ru.dimas.weather.service.withdb.UserService;
 import ru.dimas.weather.service.withoutdb.GetWeather;
 import ru.dimas.weather.service.withoutdb.GetWeatherForUser;
-import ru.dimas.weather.service.withoutdb.SessionСheckService;
+import ru.dimas.weather.service.withoutdb.SessionCheckService;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,26 +34,26 @@ public class WeatherController {
     private final SessionService sessionService;
     private final UserService userService;
     private final LocationService locationService;
-    private final SessionСheckService sessionСheckService;
+    private final SessionCheckService sessionCheckService;
     private final GetWeatherForUser getWeatherForUser;
 
     @Value("${openweathermap.api.key}")
     private String apiKey; // Загружается из application.properties
 
     public WeatherController(SessionService sessionService, UserService userService,
-                             LocationService locationService, SessionСheckService sessionСheckService,
+                             LocationService locationService, SessionCheckService sessionCheckService,
                              GetWeatherForUser getWeatherForUser) {
         this.sessionService = sessionService;
         this.userService = userService;
         this.locationService = locationService;
-        this.sessionСheckService = sessionСheckService;
+        this.sessionCheckService = sessionCheckService;
         this.getWeatherForUser = getWeatherForUser;
     }
 
     @GetMapping("/{id}")
-    public String showUserWeatherPage(Model model, HttpSession httpSession, @PathVariable Long id) {
+    public String showUserWeatherPage(Model model, HttpSession httpSession) {
         logger.info("showUserWeatherPage method called for User with ID {}", httpSession.getAttribute("userId"));
-        sessionСheckService.checkSession(sessionService, httpSession);
+        sessionCheckService.checkSession(sessionService, httpSession);
         try {
             getWeatherForUser.getAllWeatherForUser(model, (Long) httpSession.getAttribute("userId"));
         } catch (LocationsFromApiNotFoundException | ResourceAccessException e) {
@@ -64,9 +64,9 @@ public class WeatherController {
     }
 
     @GetMapping("/{id}/add")
-    public String searchLocations(@PathVariable Long id, @RequestParam String locationName, HttpSession httpSession, Model model) {
+    public String searchLocations(@RequestParam String locationName, HttpSession httpSession, Model model) {
         logger.info("searchLocations method called with userId: {}, locationName: {}", httpSession.getAttribute("userId"), locationName);
-        sessionСheckService.checkSession(sessionService, httpSession);
+        sessionCheckService.checkSession(sessionService, httpSession);
         List<CityDto> cityDtoList = GetWeather.checkLocation(locationName, apiKey);
         model.addAttribute("cityDtoList", cityDtoList);
         model.addAttribute("isAddPage", true); // Указываем, что это страница добавления
@@ -74,10 +74,10 @@ public class WeatherController {
     }
 
     @PostMapping("/{id}/add")
-    public String addLocation(@ModelAttribute CityDto cityDto, HttpSession httpSession, Model model, @PathVariable Long id) {
-        id = (Long) httpSession.getAttribute("userId");
+    public String addLocation(@ModelAttribute CityDto cityDto, HttpSession httpSession, Model model) {
+        Long id = (Long) httpSession.getAttribute("userId");
         logger.info("addLocation method called with userId: {}, location: {}", id, cityDto);
-        sessionСheckService.checkSession(sessionService, httpSession);
+        sessionCheckService.checkSession(sessionService, httpSession);
         try {
             Optional<User> userOptional = userService.getUserById(id);
             if (userOptional.isEmpty()) {
@@ -104,10 +104,10 @@ public class WeatherController {
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteLocation(@ModelAttribute WeatherDto weatherDto, HttpSession httpSession, Model model, @PathVariable Long id) {
+    public String deleteLocation(@ModelAttribute WeatherDto weatherDto, HttpSession httpSession) {
         logger.info("deleteLocation method called with userId: {}, location with id: {}", httpSession.getAttribute("userId"), weatherDto.getIdFromDatabase());
-        sessionСheckService.checkSession(sessionService, httpSession);
-        locationService.deleteLocationById((Long) weatherDto.getIdFromDatabase());
+        sessionCheckService.checkSession(sessionService, httpSession);
+        locationService.deleteLocationById(weatherDto.getIdFromDatabase());
         logger.info("deleteLocation: location deleted with userId: {}, location with id: {}", httpSession.getAttribute("userId"), weatherDto.getIdFromDatabase());
         return "redirect:/weather/" + httpSession.getAttribute("userId");
     }

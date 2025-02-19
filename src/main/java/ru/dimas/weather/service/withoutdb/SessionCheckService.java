@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
-public class SessionСheckService {
+public class SessionCheckService {
 
     private final Logger logger = LoggerFactory.getLogger(WeatherController.class);
 
