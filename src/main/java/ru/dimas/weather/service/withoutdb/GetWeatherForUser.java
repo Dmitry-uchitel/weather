@@ -46,6 +46,7 @@ public class GetWeatherForUser {
         if (locationSet.iterator().hasNext()) {
             for (Location location : locationSet) {
                 WeatherDto weatherDto = GetWeather.getWeather(location, apiKey);
+
                 weatherDto.setIdFromDatabase(location.getId());
                 weatherList.add(weatherDto);
             }

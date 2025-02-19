@@ -70,7 +70,8 @@ public class WeatherController {
         logger.info("searchLocations method called with userId: {}, locationName: {}", httpSession.getAttribute("userId"), locationName);
         sessionСheckService.checkSession(sessionService, httpSession);
         List<CityDto> cityDtoList = GetWeather.checkLocation(locationName, apiKey);
-        model.addAttribute(cityDtoList);
+        model.addAttribute("cityDtoList", cityDtoList);
+        model.addAttribute("isAddPage", true); // Указываем, что это страница добавления
         return "weather";
     }
 
@@ -95,14 +96,17 @@ public class WeatherController {
                 logger.error("User with ID {} already has this location {}", id, cityDto.getName());
                 throw new LocationAlreadyAddedException("Location already added");
             }
+            else {
+                locationService.createLocation(location);
+                logger.info("Location added successfully: {}", location);
+            }
         } catch (LocationAlreadyAddedException e) {
             model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("isAddPage", true); // Указываем, что это страница добавления
+            return "weather";
         } catch (UserNotFoundException e) {
             return "login";
         }
-
-        locationService.createLocation(location);
-        logger.info("Location added successfully: {}", location);
 
         return "redirect:/weather/" + id;
     }

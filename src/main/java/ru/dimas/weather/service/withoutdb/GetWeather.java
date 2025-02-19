@@ -84,6 +84,7 @@ public class GetWeather {
         RestTemplate restTemplate = new RestTemplate();
         // Выполняем GET-запрос
         String response = restTemplate.getForObject(url, String.class);
+//        logger.info("{}", response);
         // Проверяем, что ответ не null
         if (response == null) {
             logger.warn("Пустой ответ от API для города org/data/2.5");

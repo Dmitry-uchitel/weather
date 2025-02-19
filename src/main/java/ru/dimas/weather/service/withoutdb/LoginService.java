@@ -35,6 +35,8 @@ public class LoginService {
     public void loginUser(User user, HttpSession httpSession) {
         logger.info("loginUser method called with userName: {}", user.getLogin());
         // Проверяем, существует ли пользователь с таким логином
+
+
         if (!userService.userExists(user.getLogin())) {
             logger.error("A user with login: {} does not exist", user.getLogin());
             throw new UserWithLoginIsNotExist("A user with this login does not exist");
