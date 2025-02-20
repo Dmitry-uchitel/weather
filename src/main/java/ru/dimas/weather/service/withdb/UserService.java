@@ -1,6 +1,11 @@
 package ru.dimas.weather.service.withdb;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import ru.dimas.weather.controller.WeatherController;
+import ru.dimas.weather.exception.UserAlreadyExistsException;
 import ru.dimas.weather.model.User;
 import ru.dimas.weather.repository.UserRepository;
 
@@ -10,14 +15,19 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-
+    private final Logger logger = LoggerFactory.getLogger(WeatherController.class);
     // Конструктор для внедрения зависимости
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public void createUser(User user) {
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            logger.error("User with login {} already exist", user.getLogin());
+            throw new UserAlreadyExistsException("User with this login already exists");
+        }
     }
 
     public Optional<User> getUserById(Long id) {
@@ -26,10 +36,6 @@ public class UserService {
 
     public Optional<User> getUserByLogin(String login) {
         return userRepository.findByLogin(login);
-    }
-
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
     }
 
     public boolean userExists(String login) {
