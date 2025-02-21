@@ -1,14 +1,14 @@
-package ru.dimas.weather.service.withdb;
+package ru.dimas.weather.service.withoutdb;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import ru.dimas.weather.exception.UserAlreadyExistsException;
 import ru.dimas.weather.model.User;
 import ru.dimas.weather.repository.UserRepository;
+import ru.dimas.weather.service.withdb.UserService;
 
 import java.util.Optional;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // Использование профиля "test"
 @DataJpaTest // Автоматическая настройка Spring Data JPA с H2
-class UserServiceTest {
+class SesionCheckServiceTest {
 
     @Autowired
     private UserRepository userRepository;
