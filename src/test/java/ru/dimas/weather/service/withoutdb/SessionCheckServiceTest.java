@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // Использование профиля "test"
 @DataJpaTest // Автоматическая настройка Spring Data JPA с H2
-class SesionCheckServiceTest {
+class SessionCheckServiceTest {
 
     @Autowired
     private UserRepository userRepository;
