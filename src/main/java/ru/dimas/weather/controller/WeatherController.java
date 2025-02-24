@@ -30,24 +30,26 @@ import java.util.Optional;
 @RequestMapping("/weather")
 public class WeatherController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WeatherController.class);
+    private final Logger logger = LoggerFactory.getLogger(WeatherController.class);
     private final SessionService sessionService;
     private final UserService userService;
     private final LocationService locationService;
     private final SessionCheckService sessionCheckService;
     private final GetWeatherForUser getWeatherForUser;
+    private final GetWeather getWeather;
 
     @Value("${openweathermap.api.key}")
     private String apiKey; // Загружается из application.properties
 
     public WeatherController(SessionService sessionService, UserService userService,
                              LocationService locationService, SessionCheckService sessionCheckService,
-                             GetWeatherForUser getWeatherForUser) {
+                             GetWeatherForUser getWeatherForUser, GetWeather getWeather) {
         this.sessionService = sessionService;
         this.userService = userService;
         this.locationService = locationService;
         this.sessionCheckService = sessionCheckService;
         this.getWeatherForUser = getWeatherForUser;
+        this.getWeather = getWeather;
     }
 
     @GetMapping("/{id}")
@@ -67,7 +69,7 @@ public class WeatherController {
     public String searchLocations(@RequestParam String locationName, HttpSession httpSession, Model model) {
         logger.info("searchLocations method called with userId: {}, locationName: {}", httpSession.getAttribute("userId"), locationName);
         sessionCheckService.checkSession(sessionService, httpSession);
-        List<CityDto> cityDtoList = GetWeather.checkLocation(locationName, apiKey);
+        List<CityDto> cityDtoList = getWeather.checkLocation(locationName, apiKey);
         model.addAttribute("cityDtoList", cityDtoList);
         model.addAttribute("isAddPage", true); // Указываем, что это страница добавления
         return "weather";

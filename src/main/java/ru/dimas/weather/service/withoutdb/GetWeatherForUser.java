@@ -24,14 +24,16 @@ public class GetWeatherForUser {
 
     private final UserService userService;
     private final LocationService locationService;
+    private final GetWeather getWeather;
 
 
     @Value("${openweathermap.api.key}")
     private String apiKey; // Загружается из application.properties
 
-    public GetWeatherForUser(UserService userService, LocationService locationService) {
+    public GetWeatherForUser(UserService userService, LocationService locationService, GetWeather getWeather) {
         this.userService = userService;
         this.locationService = locationService;
+        this.getWeather=getWeather;
     }
 
     public void getAllWeatherForUser(Model model, Long userId) {
@@ -48,7 +50,7 @@ public class GetWeatherForUser {
 
         if (locationSet.iterator().hasNext()) {
             for (Location location : locationSet) {
-                WeatherDto weatherDto = GetWeather.getWeather(location, apiKey);
+                WeatherDto weatherDto = getWeather.getWeather(location, apiKey);
 
                 weatherDto.setIdFromDatabase(location.getId());
                 weatherList.add(weatherDto);

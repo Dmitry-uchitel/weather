@@ -15,7 +15,7 @@ import java.util.UUID;
 @RequestMapping("/logout")
 public class LogoutController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WeatherController.class);
+    private final Logger logger = LoggerFactory.getLogger(WeatherController.class);
     private final SessionService sessionService;
 
     public LogoutController(SessionService sessionService) {

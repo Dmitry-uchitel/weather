@@ -19,7 +19,7 @@ import ru.dimas.weather.service.withoutdb.LoginService;
 public class RegistrationController {
 
     private final LoginService loginService;
-    private static final Logger logger = LoggerFactory.getLogger(WeatherController.class);
+    private final Logger logger = LoggerFactory.getLogger(WeatherController.class);
 
     public RegistrationController(LoginService loginService) {
         this.loginService = loginService;

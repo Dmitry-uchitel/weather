@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.dimas.weather.DTO.CityDto;
@@ -15,11 +16,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class GetWeather {
 
     private static final Logger logger = LoggerFactory.getLogger(GetWeather.class);
 
-    public static void main(String[] args) throws JsonProcessingException {
+    public void main(String[] args) throws JsonProcessingException {
         CityDto cityDto = checkLocation("Angarsk", "d808a52e628b587744a56dfbc06eb60f").get(0);
         Location location = new Location();
         location.setName("Moscow");
@@ -29,7 +31,7 @@ public class GetWeather {
 
     }
 
-    public static List<CityDto> checkLocation(String cityName, String apiKey) {
+    public List<CityDto> checkLocation(String cityName, String apiKey) {
         // URL внешнего API
         String baseUrl = "http://api.openweathermap.org/geo/1.0/direct";
 
@@ -67,7 +69,7 @@ public class GetWeather {
         return cities;
     }
 
-    public static WeatherDto getWeather(Location location, String apiKey) {
+    public WeatherDto getWeather(Location location, String apiKey) {
         // URL внешнего API
         String baseUrl = "https://api.openweathermap.org/data/2.5/weather";
         // Создаем URI с параметрами
