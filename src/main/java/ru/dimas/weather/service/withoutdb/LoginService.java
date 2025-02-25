@@ -44,11 +44,11 @@ public class LoginService {
             logger.error("A user with login: {} Wrong password", user.getLogin());
             throw new WrongPasswordException("Wrong password");
         }
-        createSesion(user, httpSession, sessionService);
+        createSession(user, httpSession, sessionService);
         logger.info("User login with id: {} completed", httpSession.getAttribute("userId"));
     }
 
-    public void createSesion(User user, HttpSession httpSession, SessionService sessionService) {
+    private void createSession(User user, HttpSession httpSession, SessionService sessionService) {
         Session session = new Session(user, LocalDateTime.now().plusMinutes(sessionTime));
         sessionService.createSession(session);
         httpSession.setAttribute("userId", user.getId());
@@ -60,7 +60,7 @@ public class LoginService {
     public void registration(User user, HttpSession httpSession) {
         logger.info("registrationUser method called with userName: {}", user.getLogin());
         userService.createUser(user);
-        createSesion(user, httpSession, sessionService);
+        createSession(user, httpSession, sessionService);
         logger.info("registrationUser with id:{} is completed", user.getId());
     }
 }

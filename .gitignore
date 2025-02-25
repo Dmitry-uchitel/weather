@@ -2,6 +2,10 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+mvnw
+mvnw.cmd
+Weather.iml
+
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
